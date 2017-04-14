@@ -1,0 +1,16 @@
+New log file opened at Sat Nov 05 22:50:48 CST 2016 by 13304@DESKTOP-ELDE5MQ
+Taking next connection to: 57583
+New client attempting to connect on port: 57584-57583
+  Address = /192.168.44.1:57583
+This client on port 57584 has uuid 2617c382-ca1b-4b4c-8f63-d6b7654f9632 configName activator humanReadableName Activator protocolVersion 3 featureTags Vector()
+Connected Clients: activator-2617c382-ca1b-4b4c-8f63-d6b7654f9632
+Taking next connection to: 57583
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 57583
+Checking to see if clients are empty...
+No non-daemon clients connected after 3 min. Shutting down.
+Server socket thread exiting.
+0 clients open, will close them...
+All client sockets have been closed.
+Closing the 13304@DESKTOP-ELDE5MQ logs at Sat Nov 05 22:56:48 CST 2016, goodbye.
