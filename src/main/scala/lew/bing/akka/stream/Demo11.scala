@@ -18,15 +18,16 @@ import scala.util.Random
   */
 object Demo11 {
 
+  implicit val system = ActorSystem("QuickStart")
+  implicit val materializer = ActorMaterializer()
+  implicit val order = ByteOrder.LITTLE_ENDIAN
   def main(args: Array[String]): Unit = {
 
-    implicit val system = ActorSystem("QuickStart")
-    implicit val materializer = ActorMaterializer()
-    implicit val order = ByteOrder.LITTLE_ENDIAN
+
     import scala.concurrent.ExecutionContext.Implicits.global
     //自定义graphstage
     val source = Source.fromGraph(new NumbersSource)
-    source.runWith(Sink.fromGraph(new StdoutSink))
+    source.via(new MyMapFlow(i => i - 102)).runWith(Sink.fromGraph(new StdoutSink))
   }
 
   class NumbersSource extends GraphStage[SourceShape[Int]] {
@@ -54,6 +55,7 @@ object Demo11 {
 
   class StdoutSink extends GraphStage[SinkShape[Int]] {
     val in:Inlet[Int] = Inlet("StdoutSink")
+    val log = materializer.system.log
 
     override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
@@ -61,7 +63,7 @@ object Demo11 {
 
         setHandler(in,new InHandler {
           override def onPush(): Unit = {
-            println(s"thread:${Thread.currentThread().getName},value:${grab(in)}")
+            log.info(s"next:${grab(in)}")
             pull(in)
           }
 
@@ -72,5 +74,34 @@ object Demo11 {
       }
 
     override val shape: SinkShape[Int] = SinkShape(in)
+  }
+
+  class MyMapFlow(function:(Int) => Int) extends GraphStage[FlowShape[Int,Int]] {
+
+    val inlet = Inlet[Int]("map inlet")
+    val outlet = Outlet[Int]("map outlet")
+    val log = materializer.system.log
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+      new GraphStageLogic(shape) {
+//        override def preStart(): Unit = pull(inlet)
+
+        var nextNumber = 0
+        setHandler(inlet,new InHandler {
+          override def onPush(): Unit = {
+            push(outlet,function(grab(inlet)))
+          }
+        })
+
+        setHandler(outlet,new OutHandler {
+          override def onPull(): Unit = {
+            log.info("推送")
+
+            pull(inlet)
+          }
+        })
+
+      }
+
+    override val shape: FlowShape[Int, Int] = FlowShape(inlet,outlet)
   }
 }
