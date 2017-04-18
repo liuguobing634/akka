@@ -2,7 +2,7 @@ package lew.bing.akka.stream
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Sink, Source}
-import akka.stream.{ActorMaterializer, Fusing}
+import akka.stream.{ActorMaterializer}
 
 /**
   * Created by 刘国兵 on 2017/4/13.
@@ -13,9 +13,8 @@ object Demo1 {
     implicit val system = ActorSystem("QuickStart")
     implicit val materializer = ActorMaterializer()
     val flow = Flow[Int].map(_ * 2).filter(_ > 500)
-    val fused = Fusing.aggressive(flow)
 
-    val source = Source.fromIterator {() => Iterator from 0}.via(fused).take(1000)
+    val source = Source.fromIterator {() => Iterator from 0}.via(flow).take(1000)
 //    source.runForeach(i => println(i))
     val runnable =Source(1 to 100).map(i => {
       println(s"第一个：${Thread.currentThread().getName} - $i")

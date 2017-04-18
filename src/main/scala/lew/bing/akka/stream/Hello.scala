@@ -21,7 +21,7 @@ object Hello {
       .map(num => ByteString(s"$num\n"))
       .runWith(FileIO.toPath(Paths.get("factorials.txt")))
     //reusable
-    def lineSink(filename: String): Sink[String, Future[IOResult]] =
+    def lineSink(filename: String) =
       Flow[String]
         .map(s => ByteString(s + "\n"))
         .toMat(FileIO.toPath(Paths.get(filename)))(Keep.right)
