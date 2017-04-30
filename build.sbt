@@ -29,6 +29,7 @@ libraryDependencies ++=Seq(
 "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
   "com.typesafe.akka" %% "akka-typed" % akkaVersion,
   "com.typesafe.akka" %% "akka-contrib" % akkaVersion,
+  "com.typesafe.akka" %% "akka-http" % "10.0.5",
 "org.scala-lang" % "scala-library" % scalaVersion.value
 )
 

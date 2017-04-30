@@ -74,7 +74,10 @@ object Demo7 {
 
     //如果抛出ServiceUnavailable，关闭CounterService
     override val supervisorStrategy = OneForOneStrategy(){
-      case _: CounterService.ServiceUnavailable => Stop
+      case _: CounterService.ServiceUnavailable => {
+        log.info("有异常，关闭counterService???")
+        Stop
+      }
     }
 
     var progressListener:Option[ActorRef] = None
@@ -128,7 +131,10 @@ object Demo7 {
       maxNrOfRetries = 3,
       withinTimeRange = 5.seconds
     ) {
-      case _: Storage.StorageException => Restart
+      case _: Storage.StorageException => {
+        println("有异常，重启？")
+        Restart
+      }
     }
 
     val key: String = self.path.name
@@ -187,6 +193,10 @@ object Demo7 {
           backlog :+= (sender() -> msg)
       }
     }
+
+    override def postStop(): Unit = {
+      println("stop")
+    }
   }
 
   object Counter {
@@ -244,6 +254,10 @@ object Demo7 {
       case Store(Entry(key,value)) => db.save(key,value)
       case Get(key)                =>
         sender() ! Entry(key,db.load(key).getOrElse(0L))
+    }
+
+    override def postRestart(reason: Throwable): Unit = {
+      println(reason)
     }
   }
 
