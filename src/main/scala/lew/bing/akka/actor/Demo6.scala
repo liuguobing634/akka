@@ -2,6 +2,7 @@ package lew.bing.akka.actor
 
 import akka.actor.Props
 import akka.typed._
+import akka.typed.scaladsl.Actor
 import akka.typed.scaladsl.Actor._
 import akka.util.Timeout
 
@@ -29,8 +30,11 @@ object Demo6 {
 
     private final case class PostSessionMessage(screenName:String,message:String) extends Command
 
+    val behavior: Behavior[Command] =
+      chatRoom(List.empty)
+
     def chatRoom(sessions:List[ActorRef[SessionEvent]] = List.empty):Behavior[Command] =
-      Stateful[Command] { (ctx,msg) =>
+      Actor.immutable[Command] { (ctx,msg) =>
         msg match {
           case GetSession(screenName, client) ⇒
             val wrapper = ctx.spawnAdapter {
@@ -41,7 +45,7 @@ object Demo6 {
           case PostSessionMessage(screenName, message) ⇒
             val mp = MessagePosted(screenName, message)
             sessions foreach (_ ! mp)
-            Same
+            Actor.same
         }
       }
 
@@ -52,37 +56,34 @@ object Demo6 {
 
     import ChatRoom._
     val gabbler: Behavior[SessionEvent] =
-      Stateful[SessionEvent] { (_, msg) ⇒
+      Actor.immutable[SessionEvent] { (_, msg) ⇒
         msg match {
           case SessionDenied(reason) ⇒
             println(s"cannot start chat room session: $reason")
-            Stopped
+            Actor.stopped
           case SessionGranted(handle) ⇒
             handle ! PostMessage("Hello World!")
-            Same
+            Actor.same
           case MessagePosted(screenName, message) ⇒
             println(s"message has been posted by '$screenName': $message")
-            Stopped
+            Actor.stopped
         }
       }
 
     val main: Behavior[akka.NotUsed] =
-      Stateful(
-        behavior = (_, _) => Unhandled,
-        signal = { (ctx, sig) =>
-          sig match {
-            case PreStart =>
-              val chatRoom = ctx.spawn(ChatRoom.chatRoom(), "chatroom")
-              val gabblerRef = ctx.spawn(gabbler, "gabbler")
-              ctx.watch(gabblerRef)
-              chatRoom ! GetSession("ol’ Gabbler", gabblerRef)
-              Same
-            case Terminated(ref) =>
-              Stopped
-            case _ =>
-              Unhandled
-          }
-        })
+      Actor.deferred { ctx ⇒
+        val chatRoom = ctx.spawn(ChatRoom.behavior, "chatroom")
+        val gabblerRef = ctx.spawn(gabbler, "gabbler")
+        ctx.watch(gabblerRef)
+        chatRoom ! GetSession("ol’ Gabbler", gabblerRef)
+
+        Actor.immutable[akka.NotUsed] {
+          (_, _) ⇒ Actor.unhandled
+        } onSignal {
+          case (ctx, Terminated(ref)) ⇒
+            Actor.stopped
+        }
+      }
 
     val system = ActorSystem("ChatRoomDemo",main)
     Await.result(system.whenTerminated,1.second)

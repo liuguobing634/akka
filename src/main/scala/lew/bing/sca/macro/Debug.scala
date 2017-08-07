@@ -1,4 +1,4 @@
-package lew.bing.scala.`macro`
+package lew.bing.sca.`macro`
 
 import scala.reflect.macros.blackbox
 import scala.language.experimental.macros

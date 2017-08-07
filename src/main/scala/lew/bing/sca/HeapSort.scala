@@ -1,4 +1,4 @@
-package lew.bing.scala
+package lew.bing.sca
 
 import scala.util.Random
 

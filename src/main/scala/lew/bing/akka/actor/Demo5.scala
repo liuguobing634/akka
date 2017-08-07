@@ -1,11 +1,14 @@
 package lew.bing.akka.actor
 
 import akka.actor.Props
+import akka.cluster.ddata.VersionVector.Same
 import akka.typed._
 import akka.typed.scaladsl.Actor._
 import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import akka.pattern._
+import akka.typed.scaladsl.Actor
+
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.concurrent.Await
@@ -19,10 +22,10 @@ object Demo5 {
   object HelloWorld {
     final case class Greet(whom:String,replyTo:ActorRef[Greeted])
     final case class Greeted(whom:String)
-    val greeter: Stateful[Greet] = Stateful[Greet] { (_,msg) =>
+    val greeter = Actor.immutable[Greet] { (_,msg) =>
       println(s"Hello ${msg.whom}!")
       msg.replyTo ! Greeted(msg.whom)
-      Same
+      Actor.same
     }
   }
 

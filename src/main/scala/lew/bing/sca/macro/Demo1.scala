@@ -1,4 +1,4 @@
-package lew.bing.scala.`macro`
+package lew.bing.sca.`macro`
 import scala.language.experimental.macros
 
 
@@ -9,11 +9,14 @@ object Demo1 {
 
   def main(args: Array[String]): Unit = {
 //    val printA = new PrintA[Int]
-//    printA.myPrint(2)
-    Debug {
-      val a = 1
-      val b = a + 2
-    }
+//    val x = 2
+//    printA.myPrint(x+2)
+//    val n = Debug {
+//      val a = 1
+//      val b = a + 2
+//      a + b
+//    }
+//    println(n)
   }
 
 }

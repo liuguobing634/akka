@@ -1,4 +1,4 @@
-package lew.bing.scala
+package lew.bing.sca
 
 /**
   * Created by 刘国兵 on 2017/4/16.
