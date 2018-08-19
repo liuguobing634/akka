@@ -172,7 +172,7 @@ object Demo7 {
         backlog = IndexedSeq.empty
       case msg: Increment => forwardOrPlaceInBacking(msg)
       case msg:GetCurrentCount => forwardOrPlaceInBacking(msg)
-      case Terminated(actorRef) if Some(actorRef) == storage =>
+      case Terminated(actorRef) if storage.contains(actorRef) =>
         storage = None
         counter foreach {_ ! UseStorage(None)}
         //10秒后发送重启命令

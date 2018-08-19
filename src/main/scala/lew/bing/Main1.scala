@@ -1,4 +1,6 @@
 package lew.bing
+import org.slf4j.{Logger, LoggerFactory}
+
 import scala.reflect.runtime.universe._
 
 
@@ -14,8 +16,14 @@ object Main1 {
 //    }
 //    val expSeq = factorialSeq.map(1.0 / _)
 //    println(expSeq.take(30).sum)
-    println(pow(2.0,0.5)*pow(1.5,0.5))
+//    println(pow(2.0,0.5)*pow(1.5,0.5))
+
+    val log = LoggerFactory.getLogger(Main1.getClass)
+    log.error("sss")
+
   }
+
+
 
   // 求x的n次方
   def pow(x:Double,n:Double): Double = {

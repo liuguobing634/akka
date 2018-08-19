@@ -9,6 +9,7 @@ object QuarterNumbers {
 //    println(quartNumbers(List(1,2,3,4,5,6,7)))
     val evenNumbers = (1 to 10).map(_*2)
     evenNumbers.foreach(println)
+
   }
 
   def quartNumbers(numbers: List[Double]):(Double,Double,Double) = {
